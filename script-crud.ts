@@ -54,7 +54,12 @@ const atualizarUI = () => {
   const ulTarefas = document.querySelector('.app__section-task-list');
   const formAdicionarTarefa = document.querySelector<HTMLFormElement>('.app__form-add-task');
   const btnAdicionarTarefa = document.querySelector<HTMLButtonElement>('.app__button--add-task');
-  const textarea = document.querySelector<HTMLTextAreaElement>('.app__form-textarea')
+  const textarea = document.querySelector<HTMLTextAreaElement>('.app__form-textarea');
+  const labelTarefaAtiva = document.querySelector<HTMLParagraphElement>('.app__section-active-task-description');
+
+  //Se existir tarefa selecionada e não estiver concluida, ele altera a label para a "descricao" da tarefa selecionada.
+  labelTarefaAtiva!.textContent = 
+    estadoInicial.tarefaSelecionada && !estadoInicial.tarefaSelecionada.concluida ? estadoInicial.tarefaSelecionada.descricao : null;
 
   if (!btnAdicionarTarefa) {
     throw new Error("O elemento btnAdicionarTarefa não foi encontrado, reveja o código");
@@ -103,13 +108,24 @@ const atualizarUI = () => {
     button.appendChild(editIcon);
 
     if (tarefa.concluida) {
-      button.setAttribute('disabled', 'true')
-      li.classList.add('app__section-task-list-item-complete')
+      button.setAttribute('disabled', 'true');
+      li.classList.add('app__section-task-list-item-complete');
     }
 
-    li.appendChild(svgIcon)
-    li.appendChild(paragraph)
-    li.appendChild(button)
+    if (tarefa == estadoInicial.tarefaSelecionada) {
+      if(!tarefa.concluida){        
+        li.classList.add('app__section-task-list-item-active')        
+      }
+    }
+
+    li.appendChild(svgIcon);
+    li.appendChild(paragraph);
+    li.appendChild(button);
+
+    li.addEventListener('click', () => {      
+      estadoInicial = selecionarTarefa(estadoInicial, tarefa);
+      atualizarUI();
+    })
 
     ulTarefas?.append(li);
   })

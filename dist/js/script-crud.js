@@ -42,17 +42,23 @@ const atualizarUI = () => {
     const formAdicionarTarefa = document.querySelector('.app__form-add-task');
     const btnAdicionarTarefa = document.querySelector('.app__button--add-task');
     const textarea = document.querySelector('.app__form-textarea');
+    const labelTarefaAtiva = document.querySelector('.app__section-active-task-description');
+    //Se existir tarefa selecionada e não estiver concluida, ele altera a label para a "descricao" da tarefa selecionada.
+    labelTarefaAtiva.textContent =
+        estadoInicial.tarefaSelecionada && !estadoInicial.tarefaSelecionada.concluida ? estadoInicial.tarefaSelecionada.descricao : null;
     if (!btnAdicionarTarefa) {
         throw new Error("O elemento btnAdicionarTarefa não foi encontrado, reveja o código");
     }
+    //Botao Adicionar Tarefa
     btnAdicionarTarefa.onclick = () => {
         //"classList.toogle verifica se existe class hidden, se existir ele remove, e se não existir ele adiciona"
         formAdicionarTarefa?.classList.toggle('hidden');
     };
+    //Formulario
     // "!" Diz para o Typescript que este elemento existe com certeza
     formAdicionarTarefa.onsubmit = (evento) => {
         evento.preventDefault(); //Não faz o reload da página ao realizar o "submit" do formulario
-        const descricao = textarea.value;
+        const descricao = textarea.value; //"!" novamente para confirmar que o elemento e existe, parando o erro de "descricao"
         estadoInicial = adicionarTarefa(estadoInicial, {
             descricao,
             concluida: false
@@ -80,9 +86,18 @@ const atualizarUI = () => {
             button.setAttribute('disabled', 'true');
             li.classList.add('app__section-task-list-item-complete');
         }
+        if (tarefa == estadoInicial.tarefaSelecionada) {
+            if (!tarefa.concluida) {
+                li.classList.add('app__section-task-list-item-active');
+            }
+        }
         li.appendChild(svgIcon);
         li.appendChild(paragraph);
         li.appendChild(button);
+        li.addEventListener('click', () => {
+            estadoInicial = selecionarTarefa(estadoInicial, tarefa);
+            atualizarUI();
+        });
         ulTarefas?.append(li);
     });
 };
