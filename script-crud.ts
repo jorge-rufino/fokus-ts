@@ -34,6 +34,13 @@ const selecionarTarefa = (estado: EstadoAplicacao, tarefa: Tarefa): EstadoAplica
   }
 }
 
+const adicionarTarefa = (estado: EstadoAplicacao, tarefa: Tarefa): EstadoAplicacao => {
+  return {
+    ...estado,
+    tarefas: [...estado.tarefas, tarefa]
+  }
+}
+
 const atualizarUI = () => {
   const taskIconSvg = `
     <svg class="app__section-task-icon-status" width="24" height="24" viewBox="0 0 24 24"
@@ -47,14 +54,29 @@ const atualizarUI = () => {
   const ulTarefas = document.querySelector('.app__section-task-list');
   const formAdicionarTarefa = document.querySelector<HTMLFormElement>('.app__form-add-task');
   const btnAdicionarTarefa = document.querySelector<HTMLButtonElement>('.app__button--add-task');
+  const textarea = document.querySelector<HTMLTextAreaElement>('.app__form-textarea')
 
-  if(!btnAdicionarTarefa){
-    throw new Error("O elemento btnAdicionarTarefa não foi encontrado, reveja o código");    
+  if (!btnAdicionarTarefa) {
+    throw new Error("O elemento btnAdicionarTarefa não foi encontrado, reveja o código");
   }
 
+  //Botao Adicionar Tarefa
   btnAdicionarTarefa.onclick = () => {
     //"classList.toogle verifica se existe class hidden, se existir ele remove, e se não existir ele adiciona"
-    formAdicionarTarefa?.classList.toggle('hidden'); 
+    formAdicionarTarefa?.classList.toggle('hidden');
+  }
+
+  //Formulario
+  // "!" Diz para o Typescript que este elemento existe com certeza
+  formAdicionarTarefa!.onsubmit = (evento) => {
+    evento.preventDefault();            //Não faz o reload da página ao realizar o "submit" do formulario
+    const descricao = textarea!.value;  //"!" novamente para confirmar que o elemento e existe, parando o erro de "descricao"
+    estadoInicial = adicionarTarefa(estadoInicial, {
+      descricao,
+      concluida: false
+    })
+    textarea!.value = '';
+    atualizarUI()
   }
 
   if (ulTarefas) {
@@ -91,6 +113,6 @@ const atualizarUI = () => {
 
     ulTarefas?.append(li);
   })
-} 
+}
 
 atualizarUI();

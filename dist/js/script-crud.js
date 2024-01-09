@@ -22,6 +22,12 @@ const selecionarTarefa = (estado, tarefa) => {
         tarefaSelecionada: tarefa === estado.tarefaSelecionada ? null : tarefa
     };
 };
+const adicionarTarefa = (estado, tarefa) => {
+    return {
+        ...estado,
+        tarefas: [...estado.tarefas, tarefa]
+    };
+};
 const atualizarUI = () => {
     const taskIconSvg = `
     <svg class="app__section-task-icon-status" width="24" height="24" viewBox="0 0 24 24"
@@ -35,12 +41,24 @@ const atualizarUI = () => {
     const ulTarefas = document.querySelector('.app__section-task-list');
     const formAdicionarTarefa = document.querySelector('.app__form-add-task');
     const btnAdicionarTarefa = document.querySelector('.app__button--add-task');
+    const textarea = document.querySelector('.app__form-textarea');
     if (!btnAdicionarTarefa) {
         throw new Error("O elemento btnAdicionarTarefa não foi encontrado, reveja o código");
     }
     btnAdicionarTarefa.onclick = () => {
         //"classList.toogle verifica se existe class hidden, se existir ele remove, e se não existir ele adiciona"
         formAdicionarTarefa?.classList.toggle('hidden');
+    };
+    // "!" Diz para o Typescript que este elemento existe com certeza
+    formAdicionarTarefa.onsubmit = (evento) => {
+        evento.preventDefault(); //Não faz o reload da página ao realizar o "submit" do formulario
+        const descricao = textarea.value;
+        estadoInicial = adicionarTarefa(estadoInicial, {
+            descricao,
+            concluida: false
+        });
+        textarea.value = '';
+        atualizarUI();
     };
     if (ulTarefas) {
         ulTarefas.innerHTML = '';
