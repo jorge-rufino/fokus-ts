@@ -14,7 +14,8 @@ let estadoInicial = {
             concluida: false
         }
     ],
-    tarefaSelecionada: null
+    tarefaSelecionada: null,
+    editando: false
 };
 const selecionarTarefa = (estado, tarefa) => {
     return {
@@ -27,6 +28,18 @@ const adicionarTarefa = (estado, tarefa) => {
         ...estado,
         tarefas: [...estado.tarefas, tarefa]
     };
+};
+const deletarTarefa = (estado) => {
+    if (estado.tarefaSelecionada) {
+        const tarefas = estado.tarefas.filter(t => t != estado.tarefaSelecionada);
+        return { ...estado, tarefas, tarefaSelecionada: null, editando: false };
+    }
+    else {
+        return estado;
+    }
+};
+const deletarTodasTarefas = (estado) => {
+    return { ...estado, tarefas: [], tarefaSelecionada: null, editando: false };
 };
 const atualizarUI = () => {
     const taskIconSvg = `
@@ -43,6 +56,7 @@ const atualizarUI = () => {
     const btnAdicionarTarefa = document.querySelector('.app__button--add-task');
     const textarea = document.querySelector('.app__form-textarea');
     const labelTarefaAtiva = document.querySelector('.app__section-active-task-description');
+    const btnDeletarTodasTarefas = document.querySelector('#btn-remover-todas');
     //Se existir tarefa selecionada e não estiver concluida, ele altera a label para a "descricao" da tarefa selecionada.
     labelTarefaAtiva.textContent =
         estadoInicial.tarefaSelecionada && !estadoInicial.tarefaSelecionada.concluida ? estadoInicial.tarefaSelecionada.descricao : null;
@@ -53,6 +67,10 @@ const atualizarUI = () => {
     btnAdicionarTarefa.onclick = () => {
         //"classList.toogle verifica se existe class hidden, se existir ele remove, e se não existir ele adiciona"
         formAdicionarTarefa?.classList.toggle('hidden');
+    };
+    btnDeletarTodasTarefas.onclick = () => {
+        estadoInicial = deletarTodasTarefas(estadoInicial);
+        atualizarUI();
     };
     //Formulario
     // "!" Diz para o Typescript que este elemento existe com certeza

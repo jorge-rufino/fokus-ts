@@ -6,6 +6,7 @@ interface Tarefa {
 interface EstadoAplicacao {
   tarefas: Tarefa[];
   tarefaSelecionada: Tarefa | null;
+  editando: boolean;
 }
 
 let estadoInicial: EstadoAplicacao = {
@@ -23,11 +24,11 @@ let estadoInicial: EstadoAplicacao = {
       concluida: false
     }
   ],
-  tarefaSelecionada: null
+  tarefaSelecionada: null,
+  editando: false
 }
 
-const selecionarTarefa = (estado: EstadoAplicacao, tarefa: Tarefa): EstadoAplicacao => {
-
+const selecionarTarefa = (estado: EstadoAplicacao, tarefa: Tarefa): EstadoAplicacao => {  
   return {
     ...estado,
     tarefaSelecionada: tarefa === estado.tarefaSelecionada ? null : tarefa
@@ -39,6 +40,19 @@ const adicionarTarefa = (estado: EstadoAplicacao, tarefa: Tarefa): EstadoAplicac
     ...estado,
     tarefas: [...estado.tarefas, tarefa]
   }
+}
+
+const deletarTarefa = (estado: EstadoAplicacao): EstadoAplicacao => {
+  if (estado.tarefaSelecionada) {
+      const tarefas = estado.tarefas.filter(t => t != estado.tarefaSelecionada);
+      return { ...estado, tarefas, tarefaSelecionada: null, editando: false };
+  } else {
+      return estado;
+  }
+}
+
+const deletarTodasTarefas = (estado: EstadoAplicacao): EstadoAplicacao => {
+  return {...estado, tarefas: [], tarefaSelecionada: null, editando: false }
 }
 
 const atualizarUI = () => {
@@ -56,6 +70,7 @@ const atualizarUI = () => {
   const btnAdicionarTarefa = document.querySelector<HTMLButtonElement>('.app__button--add-task');
   const textarea = document.querySelector<HTMLTextAreaElement>('.app__form-textarea');
   const labelTarefaAtiva = document.querySelector<HTMLParagraphElement>('.app__section-active-task-description');
+  const btnDeletarTodasTarefas = document.querySelector<HTMLButtonElement>('#btn-remover-todas');
 
   //Se existir tarefa selecionada e não estiver concluida, ele altera a label para a "descricao" da tarefa selecionada.
   labelTarefaAtiva!.textContent = 
@@ -71,6 +86,11 @@ const atualizarUI = () => {
     formAdicionarTarefa?.classList.toggle('hidden');
   }
 
+  btnDeletarTodasTarefas!.onclick = () => {
+    estadoInicial = deletarTodasTarefas(estadoInicial);
+    atualizarUI();
+  }
+
   //Formulario
   // "!" Diz para o Typescript que este elemento existe com certeza
   formAdicionarTarefa!.onsubmit = (evento) => {
@@ -81,7 +101,7 @@ const atualizarUI = () => {
       concluida: false
     })
     textarea!.value = '';
-    atualizarUI()
+    atualizarUI();
   }
 
   if (ulTarefas) {
