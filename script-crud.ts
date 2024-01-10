@@ -65,6 +65,10 @@ const editarTarefa = (estado: EstadoAplicacao, tarefa: Tarefa): EstadoAplicacao 
   return { ...estado, editando: !estado.editando, tarefaSelecionada: tarefa };
 }
 
+const cancelarTarefa = (estado: EstadoAplicacao): EstadoAplicacao => {
+  return { ...estado, editando: false, tarefaSelecionada: null };
+}
+
 const atualizarUI = () => {
   const taskIconSvg = `
     <svg class="app__section-task-icon-status" width="24" height="24" viewBox="0 0 24 24"
@@ -82,7 +86,8 @@ const atualizarUI = () => {
   const labelTarefaAtiva = document.querySelector<HTMLParagraphElement>('.app__section-active-task-description');
   const btnDeletarTodasTarefas = document.querySelector<HTMLButtonElement>('#btn-remover-todas');
   const btnDeletarTarefasConcluidas = document.querySelector<HTMLButtonElement>('#btn-remover-concluidas');
-  const labelForm = document.querySelector('.app__form-label') as HTMLLabelElement;  
+  const labelForm = document.querySelector('.app__form-label') as HTMLLabelElement;
+  const btnCancelar: HTMLButtonElement = document.querySelector('.app__form-footer__button--cancel') as HTMLButtonElement;
 
   //Se existir tarefa selecionada e não estiver concluida, ele altera a label para a "descricao" da tarefa selecionada.
   labelTarefaAtiva!.textContent =
@@ -90,6 +95,11 @@ const atualizarUI = () => {
 
   if (!btnAdicionarTarefa) {
     throw new Error("O elemento btnAdicionarTarefa não foi encontrado, reveja o código");
+  }
+
+  btnCancelar.onclick = () => {
+    formAdicionarTarefa!.classList.add('hidden');    
+    estadoInicial = cancelarTarefa(estadoInicial);
   }
 
   //Botao Adicionar Tarefa

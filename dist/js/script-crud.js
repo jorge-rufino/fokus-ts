@@ -49,6 +49,9 @@ const deletarTarefasConcluidas = (estado) => {
 const editarTarefa = (estado, tarefa) => {
     return { ...estado, editando: !estado.editando, tarefaSelecionada: tarefa };
 };
+const cancelarTarefa = (estado) => {
+    return { ...estado, editando: false, tarefaSelecionada: null };
+};
 const atualizarUI = () => {
     const taskIconSvg = `
     <svg class="app__section-task-icon-status" width="24" height="24" viewBox="0 0 24 24"
@@ -67,12 +70,17 @@ const atualizarUI = () => {
     const btnDeletarTodasTarefas = document.querySelector('#btn-remover-todas');
     const btnDeletarTarefasConcluidas = document.querySelector('#btn-remover-concluidas');
     const labelForm = document.querySelector('.app__form-label');
+    const btnCancelar = document.querySelector('.app__form-footer__button--cancel');
     //Se existir tarefa selecionada e não estiver concluida, ele altera a label para a "descricao" da tarefa selecionada.
     labelTarefaAtiva.textContent =
         estadoInicial.tarefaSelecionada && !estadoInicial.tarefaSelecionada.concluida ? estadoInicial.tarefaSelecionada.descricao : null;
     if (!btnAdicionarTarefa) {
         throw new Error("O elemento btnAdicionarTarefa não foi encontrado, reveja o código");
     }
+    btnCancelar.onclick = () => {
+        formAdicionarTarefa.classList.add('hidden');
+        estadoInicial = cancelarTarefa(estadoInicial);
+    };
     //Botao Adicionar Tarefa
     btnAdicionarTarefa.onclick = () => {
         //"classList.toogle verifica se existe class hidden, se existir ele remove, e se não existir ele adiciona"
