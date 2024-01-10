@@ -45,6 +45,10 @@ const deletarTarefasConcluidas = (estado) => {
     const tarefas = estado.tarefas.filter(tarefa => !tarefa.concluida);
     return { ...estado, tarefas, tarefaSelecionada: null, editando: false };
 };
+// Modifica o estado para entrar no modo de edição. Retorna um novo estado.
+const editarTarefa = (estado, tarefa) => {
+    return { ...estado, editando: !estado.editando, tarefaSelecionada: tarefa };
+};
 const atualizarUI = () => {
     const taskIconSvg = `
     <svg class="app__section-task-icon-status" width="24" height="24" viewBox="0 0 24 24"
@@ -62,6 +66,7 @@ const atualizarUI = () => {
     const labelTarefaAtiva = document.querySelector('.app__section-active-task-description');
     const btnDeletarTodasTarefas = document.querySelector('#btn-remover-todas');
     const btnDeletarTarefasConcluidas = document.querySelector('#btn-remover-concluidas');
+    const labelForm = document.querySelector('.app__form-label');
     //Se existir tarefa selecionada e não estiver concluida, ele altera a label para a "descricao" da tarefa selecionada.
     labelTarefaAtiva.textContent =
         estadoInicial.tarefaSelecionada && !estadoInicial.tarefaSelecionada.concluida ? estadoInicial.tarefaSelecionada.descricao : null;
@@ -81,6 +86,16 @@ const atualizarUI = () => {
         estadoInicial = deletarTarefasConcluidas(estadoInicial);
         atualizarUI();
     };
+    if (estadoInicial.editando && estadoInicial.tarefaSelecionada) {
+        formAdicionarTarefa.classList.remove('hidden');
+        labelForm.textContent = 'Editando tarefa';
+        textarea.value = estadoInicial.tarefaSelecionada.descricao;
+    }
+    else {
+        formAdicionarTarefa.classList.add('hidden');
+        labelForm.textContent = 'Adicionando tarefa';
+        textarea.value = '';
+    }
     //Formulario
     // "!" Diz para o Typescript que este elemento existe com certeza
     formAdicionarTarefa.onsubmit = (evento) => {
@@ -116,6 +131,11 @@ const atualizarUI = () => {
         if (tarefa == estadoInicial.tarefaSelecionada) {
             if (!tarefa.concluida) {
                 li.classList.add('app__section-task-list-item-active');
+                editIcon.onclick = (evento) => {
+                    evento.stopPropagation(); //Faz com o click não afete outros elementos, evitando a propagação de eventos sobre outros elementos
+                    estadoInicial = editarTarefa(estadoInicial, tarefa);
+                    atualizarUI();
+                };
             }
         }
         li.appendChild(svgIcon);
