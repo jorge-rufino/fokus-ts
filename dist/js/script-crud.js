@@ -31,7 +31,7 @@ const adicionarTarefa = (estado, tarefa) => {
 };
 const deletarTarefa = (estado) => {
     if (estado.tarefaSelecionada) {
-        const tarefas = estado.tarefas.filter(t => t != estado.tarefaSelecionada);
+        const tarefas = estado.tarefas.filter(tarefa => tarefa != estado.tarefaSelecionada);
         return { ...estado, tarefas, tarefaSelecionada: null, editando: false };
     }
     else {
@@ -40,6 +40,10 @@ const deletarTarefa = (estado) => {
 };
 const deletarTodasTarefas = (estado) => {
     return { ...estado, tarefas: [], tarefaSelecionada: null, editando: false };
+};
+const deletarTarefasConcluidas = (estado) => {
+    const tarefas = estado.tarefas.filter(tarefa => !tarefa.concluida);
+    return { ...estado, tarefas, tarefaSelecionada: null, editando: false };
 };
 const atualizarUI = () => {
     const taskIconSvg = `
@@ -57,6 +61,7 @@ const atualizarUI = () => {
     const textarea = document.querySelector('.app__form-textarea');
     const labelTarefaAtiva = document.querySelector('.app__section-active-task-description');
     const btnDeletarTodasTarefas = document.querySelector('#btn-remover-todas');
+    const btnDeletarTarefasConcluidas = document.querySelector('#btn-remover-concluidas');
     //Se existir tarefa selecionada e não estiver concluida, ele altera a label para a "descricao" da tarefa selecionada.
     labelTarefaAtiva.textContent =
         estadoInicial.tarefaSelecionada && !estadoInicial.tarefaSelecionada.concluida ? estadoInicial.tarefaSelecionada.descricao : null;
@@ -70,6 +75,10 @@ const atualizarUI = () => {
     };
     btnDeletarTodasTarefas.onclick = () => {
         estadoInicial = deletarTodasTarefas(estadoInicial);
+        atualizarUI();
+    };
+    btnDeletarTarefasConcluidas.onclick = () => {
+        estadoInicial = deletarTarefasConcluidas(estadoInicial);
         atualizarUI();
     };
     //Formulario

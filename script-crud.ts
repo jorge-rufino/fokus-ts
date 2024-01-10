@@ -28,7 +28,7 @@ let estadoInicial: EstadoAplicacao = {
   editando: false
 }
 
-const selecionarTarefa = (estado: EstadoAplicacao, tarefa: Tarefa): EstadoAplicacao => {  
+const selecionarTarefa = (estado: EstadoAplicacao, tarefa: Tarefa): EstadoAplicacao => {
   return {
     ...estado,
     tarefaSelecionada: tarefa === estado.tarefaSelecionada ? null : tarefa
@@ -44,15 +44,20 @@ const adicionarTarefa = (estado: EstadoAplicacao, tarefa: Tarefa): EstadoAplicac
 
 const deletarTarefa = (estado: EstadoAplicacao): EstadoAplicacao => {
   if (estado.tarefaSelecionada) {
-      const tarefas = estado.tarefas.filter(t => t != estado.tarefaSelecionada);
-      return { ...estado, tarefas, tarefaSelecionada: null, editando: false };
+    const tarefas: Tarefa[] = estado.tarefas.filter(tarefa => tarefa != estado.tarefaSelecionada);
+    return { ...estado, tarefas, tarefaSelecionada: null, editando: false };
   } else {
-      return estado;
+    return estado;
   }
 }
 
 const deletarTodasTarefas = (estado: EstadoAplicacao): EstadoAplicacao => {
-  return {...estado, tarefas: [], tarefaSelecionada: null, editando: false }
+  return { ...estado, tarefas: [], tarefaSelecionada: null, editando: false }
+}
+
+const deletarTarefasConcluidas = (estado: EstadoAplicacao): EstadoAplicacao => {
+  const tarefas: Tarefa[] = estado.tarefas.filter(tarefa => !tarefa.concluida);
+  return { ...estado, tarefas, tarefaSelecionada: null, editando: false };
 }
 
 const atualizarUI = () => {
@@ -71,9 +76,10 @@ const atualizarUI = () => {
   const textarea = document.querySelector<HTMLTextAreaElement>('.app__form-textarea');
   const labelTarefaAtiva = document.querySelector<HTMLParagraphElement>('.app__section-active-task-description');
   const btnDeletarTodasTarefas = document.querySelector<HTMLButtonElement>('#btn-remover-todas');
+  const btnDeletarTarefasConcluidas = document.querySelector<HTMLButtonElement>('#btn-remover-concluidas');
 
   //Se existir tarefa selecionada e não estiver concluida, ele altera a label para a "descricao" da tarefa selecionada.
-  labelTarefaAtiva!.textContent = 
+  labelTarefaAtiva!.textContent =
     estadoInicial.tarefaSelecionada && !estadoInicial.tarefaSelecionada.concluida ? estadoInicial.tarefaSelecionada.descricao : null;
 
   if (!btnAdicionarTarefa) {
@@ -88,6 +94,11 @@ const atualizarUI = () => {
 
   btnDeletarTodasTarefas!.onclick = () => {
     estadoInicial = deletarTodasTarefas(estadoInicial);
+    atualizarUI();
+  }
+
+  btnDeletarTarefasConcluidas!.onclick = () => {
+    estadoInicial = deletarTarefasConcluidas(estadoInicial);
     atualizarUI();
   }
 
@@ -133,8 +144,8 @@ const atualizarUI = () => {
     }
 
     if (tarefa == estadoInicial.tarefaSelecionada) {
-      if(!tarefa.concluida){        
-        li.classList.add('app__section-task-list-item-active')        
+      if (!tarefa.concluida) {
+        li.classList.add('app__section-task-list-item-active')
       }
     }
 
@@ -142,7 +153,7 @@ const atualizarUI = () => {
     li.appendChild(paragraph);
     li.appendChild(button);
 
-    li.addEventListener('click', () => {      
+    li.addEventListener('click', () => {
       estadoInicial = selecionarTarefa(estadoInicial, tarefa);
       atualizarUI();
     })
