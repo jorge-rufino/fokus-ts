@@ -71,12 +71,18 @@ const atualizarUI = () => {
     const btnDeletarTarefasConcluidas = document.querySelector('#btn-remover-concluidas');
     const labelForm = document.querySelector('.app__form-label');
     const btnCancelar = document.querySelector('.app__form-footer__button--cancel');
+    const btnDeletar = document.querySelector('.app__form-footer__button--delete');
     //Se existir tarefa selecionada e não estiver concluida, ele altera a label para a "descricao" da tarefa selecionada.
     labelTarefaAtiva.textContent =
         estadoInicial.tarefaSelecionada && !estadoInicial.tarefaSelecionada.concluida ? estadoInicial.tarefaSelecionada.descricao : null;
     if (!btnAdicionarTarefa) {
         throw new Error("O elemento btnAdicionarTarefa não foi encontrado, reveja o código");
     }
+    btnDeletar.onclick = () => {
+        estadoInicial = deletarTarefa(estadoInicial);
+        formAdicionarTarefa.classList.add('hidden');
+        atualizarUI();
+    };
     btnCancelar.onclick = () => {
         formAdicionarTarefa.classList.add('hidden');
         estadoInicial = cancelarTarefa(estadoInicial);
