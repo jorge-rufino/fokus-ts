@@ -162,4 +162,13 @@ const atualizarUI = () => {
         ulTarefas?.append(li);
     });
 };
+//"TarefaFinalizada" é um "CustomerEvent" que foi criado no arquivo "script.js". Ele é disparado quando o cronometro chega a zero
+//Criamos este "listener" para ficar esperando o evento ser chamado para concluir a tarefa.
+//Obs: "TarefaFinalizada" só é disparado no tipo "Foco" no cronometro.
+document.addEventListener('TarefaFinalizada', () => {
+    if (estadoInicial.tarefaSelecionada) {
+        estadoInicial.tarefaSelecionada.concluida = true;
+        atualizarUI();
+    }
+});
 atualizarUI();
