@@ -114,13 +114,21 @@ const atualizarUI = () => {
     // "!" Diz para o Typescript que este elemento existe com certeza
     formAdicionarTarefa.onsubmit = (evento) => {
         evento.preventDefault(); //Não faz o reload da página ao realizar o "submit" do formulario
-        const descricao = textarea.value; //"!" novamente para confirmar que o elemento e existe, parando o erro de "descricao"
-        estadoInicial = adicionarTarefa(estadoInicial, {
-            descricao,
-            concluida: false
-        });
-        textarea.value = '';
-        atualizarUI();
+        if (estadoInicial.editando) {
+            estadoInicial.tarefaSelecionada.descricao = textarea.value;
+            estadoInicial.editando = false;
+            formAdicionarTarefa.classList.remove('hidden');
+            atualizarUI();
+        }
+        else {
+            const descricao = textarea.value; //"!" novamente para confirmar que o elemento e existe, parando o erro de "descricao"
+            estadoInicial = adicionarTarefa(estadoInicial, {
+                descricao,
+                concluida: false
+            });
+            textarea.value = '';
+            atualizarUI();
+        }
     };
     if (ulTarefas) {
         ulTarefas.innerHTML = '';
